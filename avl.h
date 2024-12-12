@@ -12,7 +12,7 @@ typedef struct AVL{
     struct AVL * fg;
 }AVL;
 
-int estVide(AVL * a);
+
 int max(int a, int b);
 int min(int a, int b);
 int max3(int a, int b, int c);
@@ -22,7 +22,7 @@ AVL * rotationGauche(AVL * a);
 AVL * rotationDroite(AVL * a);
 AVL * doubleRotationGauche(AVL * a);
 AVL * doubleRotationDroite(AVL * a);
-AVL * equilibre(AVL * a);
+AVL * equilibreAVL(AVL * a);
 AVL * insertionAVL(AVL * a, Station e, int * h);
 int consommationTotal(AVL * a);
 void ajoutConso(AVL *a, Station e);
