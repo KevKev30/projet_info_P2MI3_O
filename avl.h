@@ -7,7 +7,7 @@ typedef struct Station{
 
 typedef struct AVL{
     Station station;
-    int eq;
+    int equilibre;
     struct AVL * fd;
     struct AVL * fg;
 }AVL;
@@ -23,5 +23,6 @@ AVL * rotationDroite(AVL * a);
 AVL * doubleRotationGauche(AVL * a);
 AVL * doubleRotationDroite(AVL * a);
 AVL * equilibre(AVL * a);
-AVL * insertionAVL(AVL * a, Station e, int * h)
+AVL * insertionAVL(AVL * a, Station e, int * h);
 int consommationTotal(AVL * a);
+void ajoutConso(AVL *a, Station e);

@@ -31,14 +31,14 @@ int min3(int a, int b, int c){
 
 
 AVL * creerAVL(Station e){
-    AVL * a = (AVL*) * malloc(sizeof(AVL));
+    AVL * a = malloc(sizeof(AVL));
     if (a==NULL){
         exit(0);
     }
-    a->station.identifiant = e->identifiant;
-    a->station.capacite = e->capacite;
-    a->station.somme_conso = e->somme_conso;
-    a->eq = 0;
+    a->station.identifiant = e.identifiant;
+    a->station.capacite = e.capacite;
+    a->station.somme_conso = e.somme_conso;
+    a->equilibre = 0;
     a->fg = NULL;
     a->fd = NULL;
     return a;
@@ -52,11 +52,11 @@ AVL * rotationGauche(AVL * a){
     a->fd = pivot->fg;
     pivot->fg = a;
 
-    eqa = a->eq;
-    eqp = pivot->eq;
+    eqa = a->equilibre;
+    eqp = pivot->equilibre;
 
-    a->eq = eqa - max(eqp, 0) - 1;
-    pivot->eq = min3(eqa-2, eqp+eqa-2, eqp-1);
+    a->equilibre = eqa - max(eqp, 0) - 1;
+    pivot->equilibre = min3(eqa-2, eqp+eqa-2, eqp-1);
 
     return pivot;
 }
@@ -69,11 +69,11 @@ AVL * rotationDroite(AVL * a){
     a->fg = pivot->fd;
     pivot->fd = a;
 
-    eqa = a->eq;
-    eqp = pivot->eq;
+    eqa = a->equilibre;
+    eqp = pivot->equilibre;
 
-    a->eq = eqa - min(eqp, 0) + 1;
-    pivot->eq = max3(eqa+2, eqp+eqa+2, eqp+1);
+    a->equilibre = eqa - min(eqp, 0) + 1;
+    pivot->equilibre = max3(eqa+2, eqp+eqa+2, eqp+1);
 
     return pivot;
 }
@@ -92,16 +92,16 @@ AVL * doubleRotationDroite(AVL * a){
 
 
 AVL * equilibreAVL(AVL * a){
-    if(a->eq <= -2){
-        if(a->fg->eq <= 0){
+    if(a->equilibre <= -2){
+        if(a->fg->equilibre <= 0){
             return rotationDroite(a);
         }
         else{
             return doubleRotationDroite(a);
         }
     }
-    else if(a->eq >= 2){
-        if(a->fg->eq >= 0){
+    else if(a->equilibre >= 2){
+        if(a->fg->equilibre >= 0){
             return rotationGauche(a);
         }
         else{
@@ -116,8 +116,12 @@ AVL * insertionAVL(AVL * a, Station e, int *h){
         *h = 1;
         return creerAVL(e);
     }
-    else if (e->station < a->station->somme_conso){
+    else if (e.identifiant < a->station.somme_conso){
         a->fg = insertionAVL(a->fg, e, h);
+        *h = -*h;
+    }
+    else if(e.identifiant > a->station.somme_conso){
+        a->fd = insertionAVL(a->fd, e, h);
     }
     else{
         *h = 0;
@@ -125,18 +129,39 @@ AVL * insertionAVL(AVL * a, Station e, int *h){
     }
 
     if (*h != 0){
-        a->eq += *h;
+        a->equilibre += *h;
         a = equilibreAVL(a);
-        *h = (a->eq == 0) ? 0 : 1; 
+        *h = (a->equilibre == 0) ? 0 : 1; 
     }
     return a;
 }
+
+
 
 int consommationTotal(AVL * a){
     if (a == NULL){
         return 0;
     }
     else {
-        return a->station->somme_conso + consommationTotal(a->fg) + consommationTotal(a->fd);
+        return a->station.somme_conso + consommationTotal(a->fg) + consommationTotal(a->fd);
     }
+}
+
+
+void ajoutConso(AVL * a, Station e){
+    if(a != NULL){
+        if(a->station.identifiant == e.identifiant){
+            a->station.somme_conso += e.somme_conso;
+        }
+        else if(a->station.identifiant > e.identifiant){
+            ajoutConso(a->fg, e);
+        }
+        else{
+            ajoutConso(a->fd, e);
+        }
+    }
+}
+
+int main(){
+    return 0;
 }
