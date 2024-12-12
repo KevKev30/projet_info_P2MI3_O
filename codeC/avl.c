@@ -161,7 +161,3 @@ void ajoutConso(AVL * a, Station e){
         }
     }
 }
-
-int main(){
-    return 0;
-}
