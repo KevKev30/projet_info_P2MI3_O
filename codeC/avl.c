@@ -1,7 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
 #include "avl.h"
 
 int max(int a, int b){
@@ -138,7 +134,7 @@ AVL * insertionAVL(AVL * a, Station e, int *h){
 
 
 
-int consommationTotal(AVL * a){
+int consommationTotale(AVL * a){
     if (a == NULL){
         return 0;
     }
@@ -148,16 +144,20 @@ int consommationTotal(AVL * a){
 }
 
 
-void ajoutConso(AVL * a, Station e){
-    if(a != NULL){
-        if(a->station.identifiant == e.identifiant){
-            a->station.somme_conso += e.somme_conso;
-        }
-        else if(a->station.identifiant > e.identifiant){
-            ajoutConso(a->fg, e);
-        }
-        else{
-            ajoutConso(a->fd, e);
-        }
+
+void libererAVL(AVL * a){
+    if (a != NULL){
+    libererAVL(a->fg);
+    libererAVL(a->fd);
+    free(a);
     }
+}
+
+
+AVL * lectureFichier(FILE * fichier){
+    AVL * a;
+    Station st;
+    int h;
+    FILE * f = fopen(fichier, "r");
+    return a;
 }
