@@ -144,7 +144,6 @@ int consommationTotale(AVL * a){
 }
 
 
-
 void libererAVL(AVL * a){
     if (a != NULL){
     libererAVL(a->fg);
