@@ -1,6 +1,6 @@
 #!/bin/bash
 
-nom_script=$0 
+nom_script=$0
 echo "nom du script : $nom_script"
 
 #paramètre du chemin du fichier csv
