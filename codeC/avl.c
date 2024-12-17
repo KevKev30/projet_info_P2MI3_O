@@ -112,11 +112,11 @@ AVL * insertionAVL(AVL * a, Station e, int *h){
         *h = 1;
         return creerAVL(e);
     }
-    else if (e.identifiant < a->station.somme_conso){
+    else if (e.identifiant < a->station.identifiant){
         a->fg = insertionAVL(a->fg, e, h);
         *h = -*h;
     }
-    else if(e.identifiant > a->station.somme_conso){
+    else if(e.identifiant > a->station.identifiant){
         a->fd = insertionAVL(a->fd, e, h);
     }
     else{
@@ -134,16 +134,6 @@ AVL * insertionAVL(AVL * a, Station e, int *h){
 
 
 
-int consommationTotale(AVL * a){
-    if (a == NULL){
-        return 0;
-    }
-    else {
-        return a->station.somme_conso + consommationTotal(a->fg) + consommationTotal(a->fd);
-    }
-}
-
-
 void libererAVL(AVL * a){
     if (a != NULL){
     libererAVL(a->fg);
@@ -152,11 +142,32 @@ void libererAVL(AVL * a){
     }
 }
 
+AVL * ajout_conso(AVL * a, Station e){
+    if (a != NULL){
+        a->station.somme_conso += e.somme_conso;
+        return a;
+    }
+}
 
-AVL * lectureFichier(FILE * fichier){
-    AVL * a;
-    Station st;
-    int h;
-    FILE * f = fopen(fichier, "r");
-    return a;
+
+AVL * recherche(AVL * a, Station e, int *h){
+    if (a == NULL){
+        return insertionAVL(a, e, &h);
+    }
+    if (a->station.identifiant > e.identifiant){
+        return recherche(a->fg, e, *h);
+    }
+    if (a->station.identifiant < e.identifiant){
+        return recherche(a->fd, e, *h);
+    }
+    else{
+        a = ajout_conso(a, e);
+        return a;
+    }
+}
+
+void afficherStation(AVL * a){
+    afficherStation(a->fg);
+    printf("%d:%d:%d", a->station.identifiant, a->station.capacite, a->station.somme_conso);
+    afficherStation(a->fd);
 }
