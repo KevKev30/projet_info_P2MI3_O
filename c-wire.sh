@@ -1,5 +1,8 @@
 #!/bin/bash
 
+nom_script=$0 
+echo "nom du script : $nom_script"
+
 #paramètre du chemin du fichier csv
 fichier_csv=$1
 #verifie si le fichier existe
@@ -84,14 +87,14 @@ fi
 
 
 
-
+ 
 #récupère le temps au debut du traitement 
 debut=$(date +%s)
 
 
 
 #traitement de données
-
+sleep 5
 
 
 
