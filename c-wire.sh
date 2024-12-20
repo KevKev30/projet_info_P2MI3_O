@@ -28,10 +28,6 @@ function option_aide(){
     exit 0
 }
 
-#cérification de la présence de l'option d'aide (-h) (Ne fonctionne pas encore)
-if [[ "$@" =~ "-h" ]]; then
-    option_aide
-fi
 
 #paramètre du chemin du fichier csv
 fichier_csv=$1
@@ -63,10 +59,12 @@ function choix_station(){
     echo " hva"
     echo " lv"
     read -p "Quel station souhaitez-vous analyser ? " station
+    echo "Si vous aveez besoin d'aide, faites -h sur le terminal."
     case $station in 
         hvb) echo "Vous avez choisi la station : $station (high-voltage B)" ;;
         hva) echo "Vous avez choisi la station : $station (high-voltage A)";;
         lv) echo "Vous avez choisi la station : $station (low-voltage)";;
+        -h)option_aide;
         *) echo "La station $station n'existe pas, veuillez réessayez"; 
         choix_station 
     esac
@@ -81,10 +79,12 @@ function choix_consommateur(){
     echo " indiv"
     echo " all"
     read -p "Quel consommateur souhaitez-vous analyser ? " consommateur
+    echo "Si vous aveez besoin d'aide, faites -h sur le terminal."
     case $consommateur in 
         comp) echo "Vous avez choisi le consommateur : $consommateur (entreprises)";;
         indiv) echo "Vous avez choisi le consommateur : $consommateur (particuliers)";;
         all) echo "Vous avez choisi le consommateur : $consommateur (tous)";;
+        -h)option_aide;
         *) echo "Le consommateur $consommateur n'existe pas, veuillez réessayez"; 
         choix_consommateur ;;
     esac
