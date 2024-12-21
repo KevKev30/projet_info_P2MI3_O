@@ -4,7 +4,7 @@ int main(int argc, char * argv[]){
     AVL * a = NULL;
     Station e;
     int h;
-    FILE * fichier = fopen(argv[0], "r");
+    FILE * fichier = fopen(argv[1], "r");
     if (fichier == NULL){
         exit(1);
     }

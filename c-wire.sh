@@ -152,44 +152,46 @@ function filtrage(){
         hvb)
         while IFS=';', read -r c1 c2 c3 c4 c5 c6 c7 c8; do
             if [ "$c2" != "-" ] ; then
-                  cut -d';', -f2,7,8 "$fichier_csv" | tr ';' ':' > "$fichier_tmp"
+                  echo "$c2:$c7:$c8" >> "$fichier_tmp"
             fi
-        done
-        ./main.c "$fichier_tmp"
+        done < "$fichier_csv"
+        #cd codeC
+        #chmod 777 "main.c"
+        #./main.c "$fichier_tmp"
         ;;
         hva)
         while IFS=';', read -r c1 c2 c3 c4 c5 c6 c7 c8; do
             if [ "$c3" != "-" ] ; then
-                  cut -d';', -f,7,8 "$fichier_csv" | tr ';' ':' > "$fichier_tmp"
+                  echo "$c3:$c7:$c8" >> "$fichier_tmp"
             fi
-        done
-        ./main.c "$fichier_tmp"
+        done < "$fichier_csv"
+        #./main.c "$fichier_tmp"
         ;;
         lv)
         case $consommateur in
             comp)
             while IFS=';', read -r c1 c2 c3 c4 c5 c6 c7 c8; do
                 if [ "$c5" != "-" ] && [ "$c6" == "-" ] ; then
-                  cut -d';', -f4,7,8 "$fichier_csv" | tr ';' ':' > "$fichier_tmp"
+                  echo "$c4:$c7:$c8" >> "$fichier_tmp"
                 fi
-            done
-            ./main.c "$fichier_tmp"
+            done < "$fichier_csv"
+            #./main.c "$fichier_tmp"
             ;;
             indiv)
             while IFS=';', read -r c1 c2 c3 c4 c5 c6 c7 c8; do
                 if [ "$c5" == "-" ] && [ "$c6" != "-" ] ; then
-                  cut -d';', -f4,7,8 "$fichier_csv" | tr ';' ':' > "$fichier_tmp"
+                  echo "$c4:$c7:$c8" >> "$fichier_tmp"
                 fi
-            done
-            ./main.c "$fichier_tmp"
+            done < "$fichier_csv"
+            #./main.c "$fichier_tmp"
             ;;
             all)
             while IFS=';', read -r c1 c2 c3 c4 c5 c6 c7 c8; do
                 if [ "$c5" != "-" ] && [ "$c6" != "-" ] ; then
-                  cut -d';', -f4,7,8 "$fichier_csv" | tr ';' ':' > "$fichier_tmp"
+                  echo "$c4:$c7:$c8" >> "$fichier_tmp"
                 fi
-            done
-            ./main.c "$fichier_tmp"
+            done < "$fichier_csv"
+            #./main.c "$fichier_tmp"
             ;;
         esac
     esac

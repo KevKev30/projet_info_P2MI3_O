@@ -30,6 +30,6 @@ AVL * doubleRotationDroite(AVL * a);
 AVL * equilibreAVL(AVL * a);
 AVL * insertionAVL(AVL * a, Station e, int * h);
 void libererAVL(AVL * a);
-AVL * ajout_conso(AVL * a, Station e);
+void ajout_conso(AVL * a, Station e);
 AVL * recherche(AVL * a, Station e, int *h);
 void afficherStation(AVL * a);

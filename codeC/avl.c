@@ -148,7 +148,6 @@ void libererAVL(AVL * a){
 void ajout_conso(AVL * a, Station e){
     if (a != NULL){
         a->station.somme_conso += e.somme_conso;
-        return a;
     }
 }
 
@@ -171,7 +170,9 @@ AVL * recherche(AVL * a, Station e, int *h){
 
 //Cette fonction affiche le contenu de l'AVL passé en paramètre.
 void afficherStation(AVL * a){
-    afficherStation(a->fg);
-    printf("%d:%d:%d", a->station.identifiant, a->station.capacite, a->station.somme_conso);
-    afficherStation(a->fd);
+    if(a != NULL){
+        afficherStation(a->fg);
+        printf("%d:%d:%d", a->station.identifiant, a->station.capacite, a->station.somme_conso);
+        afficherStation(a->fd);
+    }
 }
