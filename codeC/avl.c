@@ -145,7 +145,7 @@ void libererAVL(AVL * a){
 }
 
 //Cette fonction ajoute la consommation d'une station à une autre station.
-AVL * ajout_conso(AVL * a, Station e){
+void ajout_conso(AVL * a, Station e){
     if (a != NULL){
         a->station.somme_conso += e.somme_conso;
         return a;
@@ -155,16 +155,16 @@ AVL * ajout_conso(AVL * a, Station e){
 //Cette fonction recherche si la station passée en paramètre existe dans l'AVL. Si oui, il additionne la consommation de cette station avec une station qui existe dans l'AVL et qu'il possède le même identifiant qu'elle. Sinon la fonction crée un neoud qui contient la station passée en paramètre.
 AVL * recherche(AVL * a, Station e, int *h){
     if (a == NULL){
-        return insertionAVL(a, e, &h);
+        return insertionAVL(a, e, h);
     }
     if (a->station.identifiant > e.identifiant){
-        return recherche(a->fg, e, *h);
+        return recherche(a->fg, e, h);
     }
     if (a->station.identifiant < e.identifiant){
-        return recherche(a->fd, e, *h);
+        return recherche(a->fd, e, h);
     }
     else{
-        a = ajout_conso(a, e);
+        ajout_conso(a, e);
         return a;
     }
 }

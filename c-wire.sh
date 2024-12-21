@@ -32,7 +32,6 @@ function option_aide(){
 #paramètre du chemin du fichier csv
 fichier_csv=$1
 
-
 #verifie si le fichier existe
 if [[ ! -e $fichier_csv ]] ; then
     echo "erreur ce fichier n'existe pas"
@@ -40,33 +39,34 @@ if [[ ! -e $fichier_csv ]] ; then
     exit 1
 fi
 
-nom_script=$0 
-echo "nom du script : $nom_script"
+#crée un fichier temporaire qui contiendra les données triées
+touch tmp.csv
+fichier_tmp="tmp.csv"
+
 echo "Contenu du fichier CSV :"
 cat "$fichier_csv"
 
 
 #paramètres des valeurs de chaque argument
-type_station=$2
-type_consommateur=$3
-id_central=$4
+station=$3
+consommateur=$4
 
 
-#fonction qui demande à l'itulisateur de choisir le type de station qu'il veut étudier
+#fonction qui demande à l'utilisateur de choisir le type de station qu'il veut étudier
 function choix_station(){
     echo "Voici les differentes stations :"
     echo " hvb"
     echo " hva"
     echo " lv"
     read -p "Quel station souhaitez-vous analyser ? " station
-    echo "Si vous aveez besoin d'aide, faites -h sur le terminal."
+    echo "Si vous avez besoin d'aide, faites -h sur le terminal."
     case $station in 
         hvb) echo "Vous avez choisi la station : $station (high-voltage B)" ;;
         hva) echo "Vous avez choisi la station : $station (high-voltage A)";;
         lv) echo "Vous avez choisi la station : $station (low-voltage)";;
-        -h)option_aide;
-        *) echo "La station $station n'existe pas, veuillez réessayez"; 
-        choix_station 
+        -h)option_aide;;
+        *) echo "La station $station n'existe pas, veuillez réessayez";
+        choix_station
     esac
 }
 choix_station
@@ -79,14 +79,14 @@ function choix_consommateur(){
     echo " indiv"
     echo " all"
     read -p "Quel consommateur souhaitez-vous analyser ? " consommateur
-    echo "Si vous aveez besoin d'aide, faites -h sur le terminal."
+    echo "Si vous avez besoin d'aide, faites -h sur le terminal."
     case $consommateur in 
         comp) echo "Vous avez choisi le consommateur : $consommateur (entreprises)";;
         indiv) echo "Vous avez choisi le consommateur : $consommateur (particuliers)";;
         all) echo "Vous avez choisi le consommateur : $consommateur (tous)";;
-        -h)option_aide;
-        *) echo "Le consommateur $consommateur n'existe pas, veuillez réessayez"; 
-        choix_consommateur ;;
+        -h)option_aide;;
+        *) echo "Le consommateur $consommateur n'existe pas, veuillez réessayez";
+        choix_consommateur
     esac
     
 }
@@ -95,7 +95,7 @@ choix_consommateur
 
 #verification options interdites
 if { [[ "$station" == "hvb" ]] || [[ "$station" == "hva" ]]; } && { [[ "$consommateur" == "indiv" ]] || [[ "$consommateur" == "all" ]]; }; then
-    echo "Attention cette option est interdites"
+    echo "Attention cette option est interdite"
     echo " "
     option_aide
     choix_station
@@ -131,8 +131,8 @@ make
 executable=main
 if [[ ! -x $executable ]] ; then
     echo "Lancement de la compilation"
-    gcc $executable -o main.c 
-    if [ $? != 0] ; then
+    make
+    if [ $? != 0 ] ; then
         echo "Erreur la compilation à échouée"
         exit 2
     fi
@@ -146,7 +146,55 @@ debut=$(date +%s)
 
 
 
-#traitement de données
+#traitement de données (Utilisation de chatGPT)
+function filtrage(){
+    case $station in
+        hvb)
+        while IFS=';', read -r c1 c2 c3 c4 c5 c6 c7 c8; do
+            if [ "$c2" != "-" ] ; then
+                  cut -d';', -f2,7,8 "$fichier_csv" | tr ';' ':' > "$fichier_tmp"
+            fi
+        done
+        ./main.c "$fichier_tmp"
+        ;;
+        hva)
+        while IFS=';', read -r c1 c2 c3 c4 c5 c6 c7 c8; do
+            if [ "$c3" != "-" ] ; then
+                  cut -d';', -f,7,8 "$fichier_csv" | tr ';' ':' > "$fichier_tmp"
+            fi
+        done
+        ./main.c "$fichier_tmp"
+        ;;
+        lv)
+        case $consommateur in
+            comp)
+            while IFS=';', read -r c1 c2 c3 c4 c5 c6 c7 c8; do
+                if [ "$c5" != "-" ] && [ "$c6" == "-" ] ; then
+                  cut -d';', -f4,7,8 "$fichier_csv" | tr ';' ':' > "$fichier_tmp"
+                fi
+            done
+            ./main.c "$fichier_tmp"
+            ;;
+            indiv)
+            while IFS=';', read -r c1 c2 c3 c4 c5 c6 c7 c8; do
+                if [ "$c5" == "-" ] && [ "$c6" != "-" ] ; then
+                  cut -d';', -f4,7,8 "$fichier_csv" | tr ';' ':' > "$fichier_tmp"
+                fi
+            done
+            ./main.c "$fichier_tmp"
+            ;;
+            all)
+            while IFS=';', read -r c1 c2 c3 c4 c5 c6 c7 c8; do
+                if [ "$c5" != "-" ] && [ "$c6" != "-" ] ; then
+                  cut -d';', -f4,7,8 "$fichier_csv" | tr ';' ':' > "$fichier_tmp"
+                fi
+            done
+            ./main.c "$fichier_tmp"
+            ;;
+        esac
+    esac
+}
+filtrage
 sleep 1
 
 

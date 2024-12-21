@@ -1,17 +1,17 @@
 #include "avl.h"
 
 int main(int argc, char * argv[]){
-    AVL * a;
+    AVL * a = NULL;
     Station e;
-    int * h;
-    FILE * fichier = fopen("tmp.csv", "r");
+    int h;
+    FILE * fichier = fopen(argv[0], "r");
     if (fichier == NULL){
         exit(1);
     }
     if (argc != 1){
         exit(2);
     }
-    while (scanf("%d:%d:%d", &e.identifiant, &e.capacite, &e.somme_conso) == 3){
+    while (fscanf(fichier, "%d:%d:%d", &e.identifiant, &e.capacite, &e.somme_conso) == 3){
         a = recherche(a, e, &h);
     }
     afficherStation(a);
