@@ -16,7 +16,7 @@ int main(int argc, char** argv){
             a = insertionAVL(a, e, &h);
         }
         else{
-            recherche(a, e, &h);
+            recherche(a, e);
         }
     }
     afficherStation(a);

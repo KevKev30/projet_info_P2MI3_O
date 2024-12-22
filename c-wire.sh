@@ -39,54 +39,41 @@ if [[ ! -e $fichier_csv ]] ; then
     exit 1
 fi
 
+if [ $# -ne 3 ] && [ $# -ne 4 ]; then
+    echo "Attention nombre d'arguments incorrect"
+    echo " "
+    option_aide
+fi
+
 #crée un fichier temporaire qui contiendra les données triées
 fichier_tmp="tmp/tempo.csv"
 
 #paramètres des valeurs de chaque argument
-station=$3
-consommateur=$4
+station=$2
+consommateur=$3
+centrale=-1
 
+if [ $# -eq 4 ]; then
+	centrale=$4
+fi
 
-#fonction qui demande à l'utilisateur de choisir le type de station qu'il veut étudier
-function choix_station(){
-    echo "Voici les differentes stations :"
-    echo " hvb"
-    echo " hva"
-    echo " lv"
-    read -p "Quel station souhaitez-vous analyser ? " station
-    echo "Si vous avez besoin d'aide, faites -h sur le terminal."
-    case $station in 
-        hvb) echo "Vous avez choisi la station : $station (high-voltage B)" ;;
-        hva) echo "Vous avez choisi la station : $station (high-voltage A)";;
-        lv) echo "Vous avez choisi la station : $station (low-voltage)";;
-        -h)option_aide;;
-        *) echo "La station $station n'existe pas, veuillez réessayez";
-        choix_station
-    esac
-}
-choix_station
+if [ $# -eq 4 ] && { ! [[ "$centrale" =~ ^[0-9]+$ ]] || [ "$centrale" -lt 1 ] || [ "$centrale" -gt 5 ]; }; then
+    echo "Attention numero de centrale incorrect"
+    echo " "
+    option_aide
+fi
 
+if [[ "$station" != "hvb" ]] && [[ "$station" != "hva" ]] && [[ "$station" != "lv" ]]; then
+    echo "Attention station incorrecte"
+    echo " "
+    option_aide
+fi
 
-#fonction qui demande à l'utilisateur de choisir le consommateur qu'il veut étudier
-function choix_consommateur(){
-    echo "Voici les differents consommateurs :"
-    echo " comp"
-    echo " indiv"
-    echo " all"
-    read -p "Quel consommateur souhaitez-vous analyser ? " consommateur
-    echo "Si vous avez besoin d'aide, faites -h sur le terminal."
-    case $consommateur in 
-        comp) echo "Vous avez choisi le consommateur : $consommateur (entreprises)";;
-        indiv) echo "Vous avez choisi le consommateur : $consommateur (particuliers)";;
-        all) echo "Vous avez choisi le consommateur : $consommateur (tous)";;
-        -h)option_aide;;
-        *) echo "Le consommateur $consommateur n'existe pas, veuillez réessayez";
-        choix_consommateur
-    esac
-    
-}
-choix_consommateur
-
+if [[ "$consommateur" != "comp" ]] && [[ "$consommateur" != "indiv" ]] && [[ "$consommateur" != "all" ]]; then
+    echo "Attention consommateur incorrect"
+    echo " "
+    option_aide
+fi
 
 #verification options interdites
 if { [[ "$station" == "hvb" ]] || [[ "$station" == "hva" ]]; } && { [[ "$consommateur" == "indiv" ]] || [[ "$consommateur" == "all" ]]; }; then
@@ -115,8 +102,13 @@ if [ -e $tmp ] ; then
         fi
     done 
 fi 
-
-
+if [[ ! -e $input ]] ; then
+    mkdir -p input
+fi
+if [[ ! -e $test ]] ; then
+    mkdir -p test
+fi
+cp "$1" "input/entree.csv"
 
 #Vérifier la présence de l'exécutable C et lancer la compilation 
 
@@ -142,39 +134,73 @@ debut=$(date +%s)
 
 
 #traitement de données (Utilisation de chatGPT)
-function filtrage(){
+
     case $station in
         hvb)
-        tail -n+2 "$fichier_csv" | cut -d';' -f2,3,4,7,8 | grep -E "^[0-9]+;-;-;" | cut -d ";" -f1,4,5 | tr '-' '0' | sort -t';' -n -k3 > "$fichier_tmp"
+            if [ $# -eq 3 ]; then
+                tail -n+2 "$fichier_csv" | cut -d';' -f2,3,4,7,8 | grep -E "^[0-9]+;-;-;" | cut -d ";" -f1,4,5 | tr '-' '0' | sort -t';' -n -k3 > "$fichier_tmp"
+            else
+                tail -n+2 "$fichier_csv" | cut -d';' -f1,2,3,4,7,8 | grep -E "^$centrale;[0-9]+;-;-;" | cut -d ";" -f2,5,6 | tr '-' '0' | sort -t';' -n -k3 > "$fichier_tmp"
+            fi
         ;;
         hva)
-        tail -n+2 "$fichier_csv" | cut -d';' -f3,4,7,8 | grep -E "^[0-9]+;-;" | cut -d ";" -f1,3,4 | tr '-' '0' | sort -t';' -n -k3 > "$fichier_tmp"
+            if [ $# -eq 3 ]; then
+                tail -n+2 "$fichier_csv" | cut -d';' -f3,4,7,8 | grep -E "^[0-9]+;-;" | cut -d ";" -f1,3,4 | tr '-' '0' | sort -t';' -n -k3 > "$fichier_tmp"
+            else
+                tail -n+2 "$fichier_csv" | cut -d';' -f1,3,4,7,8 | grep -E "^$centrale;[0-9]+;-;" | cut -d ";" -f2,4,5 | tr '-' '0' | sort -t';' -n -k3 > "$fichier_tmp"
+            fi         
         ;;
         lv)
         case $consommateur in
             comp)
-            tail -n+2 "$fichier_csv" | cut -d';' -f4,6,7,8 | grep -E "^[0-9]+;-;" | cut -d ";" -f1,3,4 | tr '-' '0' | sort -t';' -n -k3 > "$fichier_tmp"
+                if [ $# -eq 3 ]; then
+                    tail -n+2 "$fichier_csv" | cut -d';' -f4,6,7,8 | grep -E "^[0-9]+;-;" | cut -d ";" -f1,3,4 | tr '-' '0' | sort -t';' -n -k3 > "$fichier_tmp"
+                else
+                    tail -n+2 "$fichier_csv" | cut -d';' -f1,4,6,7,8 | grep -E "^$centrale;[0-9]+;-;" | cut -d ";" -f2,4,5 | tr '-' '0' | sort -t';' -n -k3 > "$fichier_tmp"
+                fi
             ;;
             indiv)
-            tail -n+2 "$fichier_csv" | cut -d';' -f4,5,7,8 | grep -E "^[0-9]+;-;" | cut -d ";" -f1,3,4 | tr '-' '0' | sort -t';' -n -k3 > "$fichier_tmp"
+                if [ $# -eq 3 ]; then
+                    tail -n+2 "$fichier_csv" | cut -d';' -f4,5,7,8 | grep -E "^[0-9]+;-;" | cut -d ";" -f1,3,4 | tr '-' '0' | sort -t';' -n -k3 > "$fichier_tmp"
+                else
+                    tail -n+2 "$fichier_csv" | cut -d';' -f1,4,5,7,8 | grep -E "^$centrale;[0-9]+;-;" | cut -d ";" -f2,4,5 | tr '-' '0' | sort -t';' -n -k3 > "$fichier_tmp"
+                fi
             ;;
             all)
-            tail -n+2 "$fichier_csv" | cut -d';' -f4,7,8 | grep -E "^[0-9]+;" | tr '-' '0' | sort -t';' -n -k3 > "$fichier_tmp"
+                if [ $# -eq 3 ]; then
+                    tail -n+2 "$fichier_csv" | cut -d';' -f4,7,8 | grep -E "^[0-9]+;" | tr '-' '0' | sort -t';' -n -k3 > "$fichier_tmp"
+                else
+                    tail -n+2 "$fichier_csv" | cut -d';' -f1,4,7,8 | grep -E "^$centrale;[0-9]+;" | cut -d';' -f2,3,4 | tr '-' '0' | sort -t';' -n -k3 > "$fichier_tmp"
+                fi
             ;;
         esac
     esac
-}
-filtrage
-sleep 1
+
+
 
 cd codeC
 chmod 777 "main"
 ./main "../$fichier_tmp" > "../tmp/fichier_triée.csv"
-echo "Identifiant station:Capacite:Consommation" > "../test/${station}_${consommateur}.csv"
-sort "../tmp/fichier_triée.csv" -t':' -n -k2 >> "../test/${station}_${consommateur}.csv"
+if [ $# -eq 3 ]; then
+    name="test/${station}_${consommateur}.csv"
+else
+    name="test/${station}_${consommateur}_${centrale}.csv"
+fi
+echo "Identifiant station:Capacite:Consommation" > "../$name"
+sort "../tmp/fichier_triée.csv" -t':' -n -k2 >> "../$name"
 cd ..
+
 if [[ "$consommateur" == "all" ]]; then
-    tail -n+2 "test/${station}_${consommateur}.csv" | 
+    tail -n+2 "$name" | sort -t':' -n -k3 > "tmp/fichier_triée2.csv"
+    tail -n10 "tmp/fichier_triée2.csv" > "tmp/fichier_triée3.csv"
+    head -n10 "tmp/fichier_triée2.csv" >> "tmp/fichier_triée3.csv"
+    if [ $# -eq 3 ]; then
+        filename="test/lv_all_minmax.csv"
+    else
+        filename="test/lv_all_minmax_$4.csv"
+    fi
+    echo "Identifiant station:Capacite:Consommation:Rendement" > "$filename"
+    awk -F: '{$4=$2-$3} {print $0}' OFS=: "tmp/fichier_triée3.csv" | sort -t':' -n -k4 >> "$filename"
 fi
 
 #récupère le temps à la fin du traitement
