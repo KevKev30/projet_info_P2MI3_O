@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#Cette fonction renvoie une fiche d'aide lorsqu'elle est appelée (-h)
 function option_aide(){
     echo "Voici une aide détaillée sur l'utilisation du script"
     echo " "
@@ -57,6 +58,7 @@ if [ $# -eq 4 ]; then
 	centrale=$4
 fi
 
+#Vérifie si les valeurs indiquées par l'utilisateur dans le terminal sont correctes
 if [ $# -eq 4 ] && { ! [[ "$centrale" =~ ^[0-9]+$ ]] || [ "$centrale" -lt 1 ] || [ "$centrale" -gt 5 ]; }; then
     echo "Attention numero de centrale incorrect"
     echo " "
@@ -85,7 +87,7 @@ if { [[ "$station" == "hvb" ]] || [[ "$station" == "hva" ]]; } && { [[ "$consomm
     
 fi
 
-
+#Création des dossiers si non existantes. Pour le tmp, s'il existe, il vide le contenu du dossier. Sinon, il le crée.
 if [[ ! -e $graphs ]] ; then
     mkdir -p graphs
 fi
@@ -110,9 +112,8 @@ if [[ ! -e $test ]] ; then
 fi
 cp "$1" "input/entree.csv"
 
+
 #Vérifier la présence de l'exécutable C et lancer la compilation 
-
-
 cd codeC
 make
 executable=main
@@ -177,10 +178,12 @@ debut=$(date +%s)
     esac
 
 
-
+#Exécution du programme C
 cd codeC
 chmod 777 "main"
 ./main "../$fichier_tmp" > "../tmp/fichier_triée.csv"
+
+#Nomme le fichier final affiche les types d'informations en première ligne
 if [ $# -eq 3 ]; then
     name="test/${station}_${consommateur}.csv"
 else
@@ -190,6 +193,7 @@ echo "Identifiant station:Capacite:Consommation" > "../$name"
 sort "../tmp/fichier_triée.csv" -t':' -n -k2 >> "../$name"
 cd ..
 
+#Fais le min_max dans le cas où le type de consommateur est "all"
 if [[ "$consommateur" == "all" ]]; then
     tail -n+2 "$name" | sort -t':' -n -k3 > "tmp/fichier_triée2.csv"
     tail -n10 "tmp/fichier_triée2.csv" > "tmp/fichier_triée3.csv"
@@ -203,7 +207,7 @@ if [[ "$consommateur" == "all" ]]; then
     awk -F: '{$4=$2-$3} {print $0}' OFS=: "tmp/fichier_triée3.csv" | sort -t':' -n -k4 >> "$filename"
 fi
 
-#récupère le temps à la fin du traitement
+#récupère le temps à la fin du traitement et affiche la durée du traitement
 fin=$(date +%s)
 duree=$(( $fin - $debut))
 echo "Le traitement a durée $duree s"

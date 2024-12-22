@@ -145,7 +145,7 @@ void libererAVL(AVL * a){
 }
 
 
-//Cette fonction recherche si la station passée en paramètre existe dans l'AVL. Si oui, il additionne la consommation de cette station avec une station qui existe dans l'AVL et qu'il possède le même identifiant qu'elle. Sinon la fonction crée un neoud qui contient la station passée en paramètre.
+//Cette fonction recherche si la station passée en paramètre existe dans l'AVL. Si oui, il additionne la consommation de cette station avec une station qui existe dans l'AVL et qu'il possède le même identifiant qu'elle.
 void recherche(AVL * a, Station e){
     if (a == NULL){
         return ;

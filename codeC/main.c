@@ -1,5 +1,9 @@
 #include "avl.h"
 
+//Le main va ouvrir le fichier à traiter et va le "retrier" en fonction des identifiants des stations via un AVL. Lorsqu'il trouve deux stations avec des identifiants identiques,
+//Celui-ci additionne leur consommation.
+//A la fin, le main écrit le résultat sur le fichier et libère l'AVL.
+
 int main(int argc, char** argv){
     AVL * a = NULL;
     Station e = {0};
