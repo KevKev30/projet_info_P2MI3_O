@@ -27,8 +27,7 @@ Ce projet permet de réaliser un programme permettant de faire la synthèse des 
         -HVB : Alimentent les consommateurs très énergivores ainsi que les stations HV-A.
         -HVA : Alimentent les entreprises moyennes ou grosses, ayant une consommation modérée comme les stations LV.
         -LV : Alimentent les entreprises et les particuliers à faibles besoins.
-
-    mais également de différents types de consommateurs (Compagnie, Individuel, tous) et ainsi filtrer et trier les données grâce à un script Shell (partie filtrage) et un programme C (partie traitement/calcul).
+mais également de différents types de consommateurs (Compagnie, Individuel, tous) et ainsi filtrer et trier les données grâce à un script Shell (partie filtrage) et un programme C (partie traitement/calcul).
 
 Le dossier du projet doit être composé de plusieurs parties :
     - Un dossier codeC où les fichiers .h, .c et le makefile sont stockés.
