@@ -5,8 +5,8 @@
 
 typedef struct Station{
     int identifiant;
-    int capacite;
-    int somme_conso;
+    long int capacite;
+    long int somme_conso;
 }Station;
 
 
@@ -31,5 +31,5 @@ AVL * equilibreAVL(AVL * a);
 AVL * insertionAVL(AVL * a, Station e, int * h);
 void libererAVL(AVL * a);
 void ajout_conso(AVL * a, Station e);
-AVL * recherche(AVL * a, Station e, int *h);
+void recherche(AVL * a, Station e, int *h);
 void afficherStation(AVL * a);

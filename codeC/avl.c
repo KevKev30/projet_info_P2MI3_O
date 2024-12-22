@@ -98,7 +98,7 @@ AVL * equilibreAVL(AVL * a){
         }
     }
     else if(a->equilibre >= 2){
-        if(a->fg->equilibre >= 0){
+        if(a->fd->equilibre >= 0){
             return rotationGauche(a);
         }
         else{
@@ -129,7 +129,7 @@ AVL * insertionAVL(AVL * a, Station e, int *h){
     if (*h != 0){
         a->equilibre += *h;
         a = equilibreAVL(a);
-        *h = (a->equilibre == 0) ? 0 : 1; 
+        *h = (a->equilibre == 0) ? 0 : 1;
     }
     return a;
 }
@@ -152,19 +152,18 @@ void ajout_conso(AVL * a, Station e){
 }
 
 //Cette fonction recherche si la station passée en paramètre existe dans l'AVL. Si oui, il additionne la consommation de cette station avec une station qui existe dans l'AVL et qu'il possède le même identifiant qu'elle. Sinon la fonction crée un neoud qui contient la station passée en paramètre.
-AVL * recherche(AVL * a, Station e, int *h){
+void recherche(AVL * a, Station e, int *h){
     if (a == NULL){
-        return insertionAVL(a, e, h);
+        return ;
     }
     if (a->station.identifiant > e.identifiant){
-        return recherche(a->fg, e, h);
+        recherche(a->fg, e, h);
     }
     if (a->station.identifiant < e.identifiant){
-        return recherche(a->fd, e, h);
+        recherche(a->fd, e, h);
     }
     else{
         ajout_conso(a, e);
-        return a;
     }
 }
 
@@ -172,7 +171,7 @@ AVL * recherche(AVL * a, Station e, int *h){
 void afficherStation(AVL * a){
     if(a != NULL){
         afficherStation(a->fg);
-        printf("%d:%d:%d", a->station.identifiant, a->station.capacite, a->station.somme_conso);
+        printf("%d:%ld:%ld \n", a->station.identifiant, a->station.capacite, a->station.somme_conso);
         afficherStation(a->fd);
     }
 }

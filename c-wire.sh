@@ -30,7 +30,7 @@ function option_aide(){
 
 
 #paramètre du chemin du fichier csv
-fichier_csv=$1
+fichier_csv="$1"
 
 #verifie si le fichier existe
 if [[ ! -e $fichier_csv ]] ; then
@@ -40,12 +40,7 @@ if [[ ! -e $fichier_csv ]] ; then
 fi
 
 #crée un fichier temporaire qui contiendra les données triées
-touch tmp.csv
-fichier_tmp="tmp.csv"
-
-echo "Contenu du fichier CSV :"
-cat "$fichier_csv"
-
+fichier_tmp="tmp/tempo.csv"
 
 #paramètres des valeurs de chaque argument
 station=$3
@@ -150,48 +145,21 @@ debut=$(date +%s)
 function filtrage(){
     case $station in
         hvb)
-        while IFS=';', read -r c1 c2 c3 c4 c5 c6 c7 c8; do
-            if [ "$c2" != "-" ] ; then
-                  echo "$c2:$c7:$c8" >> "$fichier_tmp"
-            fi
-        done < "$fichier_csv"
-        #cd codeC
-        #chmod 777 "main.c"
-        #./main.c "$fichier_tmp"
+        tail -n+2 "$fichier_csv" | cut -d';' -f2,3,4,7,8 | grep -E "^[0-9]+;-;-;" | cut -d ";" -f1,4,5 | tr '-' '0' | sort -t';' -n -k3 > "$fichier_tmp"
         ;;
         hva)
-        while IFS=';', read -r c1 c2 c3 c4 c5 c6 c7 c8; do
-            if [ "$c3" != "-" ] ; then
-                  echo "$c3:$c7:$c8" >> "$fichier_tmp"
-            fi
-        done < "$fichier_csv"
-        #./main.c "$fichier_tmp"
+        tail -n+2 "$fichier_csv" | cut -d';' -f3,4,7,8 | grep -E "^[0-9]+;-;" | cut -d ";" -f1,3,4 | tr '-' '0' | sort -t';' -n -k3 > "$fichier_tmp"
         ;;
         lv)
         case $consommateur in
             comp)
-            while IFS=';', read -r c1 c2 c3 c4 c5 c6 c7 c8; do
-                if [ "$c5" != "-" ] && [ "$c6" == "-" ] ; then
-                  echo "$c4:$c7:$c8" >> "$fichier_tmp"
-                fi
-            done < "$fichier_csv"
-            #./main.c "$fichier_tmp"
+            tail -n+2 "$fichier_csv" | cut -d';' -f4,6,7,8 | grep -E "^[0-9]+;-;" | cut -d ";" -f1,3,4 | tr '-' '0' | sort -t';' -n -k3 > "$fichier_tmp"
             ;;
             indiv)
-            while IFS=';', read -r c1 c2 c3 c4 c5 c6 c7 c8; do
-                if [ "$c5" == "-" ] && [ "$c6" != "-" ] ; then
-                  echo "$c4:$c7:$c8" >> "$fichier_tmp"
-                fi
-            done < "$fichier_csv"
-            #./main.c "$fichier_tmp"
+            tail -n+2 "$fichier_csv" | cut -d';' -f4,5,7,8 | grep -E "^[0-9]+;-;" | cut -d ";" -f1,3,4 | tr '-' '0' | sort -t';' -n -k3 > "$fichier_tmp"
             ;;
             all)
-            while IFS=';', read -r c1 c2 c3 c4 c5 c6 c7 c8; do
-                if [ "$c5" != "-" ] && [ "$c6" != "-" ] ; then
-                  echo "$c4:$c7:$c8" >> "$fichier_tmp"
-                fi
-            done < "$fichier_csv"
-            #./main.c "$fichier_tmp"
+            tail -n+2 "$fichier_csv" | cut -d';' -f4,7,8 | grep -E "^[0-9]+;" | tr '-' '0' | sort -t';' -n -k3 > "$fichier_tmp"
             ;;
         esac
     esac
@@ -199,7 +167,15 @@ function filtrage(){
 filtrage
 sleep 1
 
-
+cd codeC
+chmod 777 "main"
+./main "../$fichier_tmp" > "../tmp/fichier_triée.csv"
+echo "Identifiant station:Capacite:Consommation" > "../test/${station}_${consommateur}.csv"
+sort "../tmp/fichier_triée.csv" -t':' -n -k2 >> "../test/${station}_${consommateur}.csv"
+cd ..
+if [[ "$consommateur" == "all" ]]; then
+    tail -n+2 "test/${station}_${consommateur}.csv" | 
+fi
 
 #récupère le temps à la fin du traitement
 fin=$(date +%s)

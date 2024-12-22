@@ -10,6 +10,7 @@ all: $(EXEC)
 
 $(EXEC): $(OBJS)
 	$(CC) $(CFLAGS) $^ -o $@ 
+	rm -f $(OBJS)
 
 %.o: %.c $(DEPS)
 	$(CC) $(CFLAGS) -c $< -o $@
